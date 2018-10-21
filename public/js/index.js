@@ -9,15 +9,16 @@ socket.on('disconnect', function () {
 });
 
 socket.on('newMessage', function (message) {
+    var formatedTime = moment(message.createdAt).format('h:mm a');
     var li = jQuery('<li></li>');
-    li.text(`${message.from}: ${message.text}`);
+    li.text(`${message.from} ${formatedTime}: ${message.text}`);
 
     jQuery('#messages').append(li);
 });
 
 socket.on('newLocationMessage', function (message) {
     var li = jQuery('<li></li>');
-    li.text(`${message.from}: `).append(`<a href="${message.url}" target="_blank">Location</a>`);
+    li.text(`${message.from} ${formatedTime}: `).append(`<a href="${message.url}" target="_blank">Location</a>`);
 
     jQuery('#messages').append(li);
 });
