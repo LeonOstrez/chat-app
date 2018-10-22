@@ -5,21 +5,37 @@ const socketIO = require('socket.io');
 const http = require('http');
 
 const {generateMessage, generateLocationMessage} = require('./utils/message');
+const {isRealString} = require('./utils/validation');
+const{Users} = require('./utils/users');
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT;
 
 var app = express();
 var server = http.createServer(app);
 var io = socketIO(server);
+var users = new Users();
 
 app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
-    console.log('new user connected');
 
-    socket.emit('newMessage', generateMessage("ADMIN", "Welcome to the chat"));
+    socket.on('join', (params, callback) => {
+        if (!isRealString(params.name) || !isRealString(params.room)) {
+            return callback('Name and room required');
+        }
 
-    socket.broadcast.emit('newMessage', generateMessage("ADMIN", "New user joined chat"));
+        socket.join(params.room);
+        users.removeUser(socket.id);
+        users.addUser(socket.id, params.name, params.room);
+
+        io.to(params.room).emit('updateUserList', users.getUserList(params.room));
+
+        socket.emit('newMessage', generateMessage("ADMIN", "Welcome to the chat"));
+
+        socket.broadcast.to(params.room).emit('newMessage', generateMessage("ADMIN", `${params.name} joined the chat`));
+
+        callback();
+    });
 
     socket.on('createMessage', (message, callback) => {
         // console.log('create message', message);
@@ -32,7 +48,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log('user was disconnected');
+        var user = users.removeUser(socket.id);
+
+        if (user) {
+            io.to(user.room).emit('updateUserList', users.getUserList(user.room));
+            io.to(user.room).emit('newMessage', generateMessage('ADMIN', `${user.name} has left`));
+        }
     });
 });
 
