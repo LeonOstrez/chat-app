@@ -56,3 +56,4 @@ deploy-job:      # This job runs in the deploy stage.
           git pull origin master &&
           npm i
           "
+    - echo "test"
