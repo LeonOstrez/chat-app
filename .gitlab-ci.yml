@@ -43,7 +43,16 @@ lint-test-job:   # This job also runs in the test stage.
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
   environment: production
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo -e "$PROD_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - echo "Deploying application..."
-    - echo "Application successfully deployed."
-    - echo "another change"
+    - ssh ubuntu@$PROD_SERVER "
+        cd /chat-app/ &&
+          git stash &&
+          git checkout master &&
+          git pull origin master &&
+          npm i
+          "
