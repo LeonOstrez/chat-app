@@ -25,5 +25,5 @@ stages:          # List of stages for jobs, and their order of execution
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
   script:
-    - 'curl --request POST --header "Content-Type: application/json" --data "{\"username\":\"admin\",\"password\":\"$RESPONSIVEYE_ADMIN_PASS\",\"url\":\"responsiveye.com\"}" "http://0373-141-136-146-0.ngrok.io/api/v1/processPage"'
+    - 'curl --request POST --header "Content-Type: application/json" --data "{\"username\":\"admin\",\"password\":\"$RESPONSIVEYE_ADMIN_PASS\",\"url\":\"responsiveye.com\"}" "https://responsiveye.com/api/v1/processPage"'
     - echo "Compile complete.!"
