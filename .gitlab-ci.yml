@@ -54,6 +54,5 @@ deploy-job:      # This job runs in the deploy stage.
           git stash &&
           git checkout master &&
           git pull origin master &&
-          npm i
-          "
+          npm install"
     - echo "test"
