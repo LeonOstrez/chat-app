@@ -50,7 +50,7 @@ deploy-job:      # This job runs in the deploy stage.
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh ubuntu@$PROD_SERVER "
-        cd /chat-app/ &&
+        cd ~/chat-app &&
           git stash &&
           git checkout master &&
           git pull origin master &&
